@@ -1,0 +1,15 @@
+{
+  "missing_value_strategy": {
+    "numerical": "median",
+    "categorical": "mode"
+  },
+  "encoding": {
+    "categorical": "onehot"
+  },
+  "scaling": {
+    "numerical": "standard"
+  },
+  "train_test_split": 0.2,
+  "random_state": 42,
+  "save_processed_data": true
+}

@@ -1,0 +1,11 @@
+{
+  "dataset_name": "credit_risk",
+  "task_type": "binary_classification",
+  "target_column": "target",
+  "id_column": null,
+  "feature_columns": ["age", "income", "loan_amount", "credit_score", "tenure"],
+  "numerical_columns": ["age", "income", "loan_amount", "credit_score", "tenure"],
+  "categorical_columns": [],
+  "datetime_columns": [],
+  "drop_columns": []
+}
