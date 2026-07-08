@@ -39,9 +39,9 @@ env/
 Thumbs.db
 
 # Data and models
-data/
-models/
-reports/
+/data/
+/models/
+/reports/
 
 # Logs and cache
 *.log
