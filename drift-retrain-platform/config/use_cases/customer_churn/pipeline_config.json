@@ -1,0 +1,30 @@
+{
+  "data_settings": {
+    "reference_data_path": "data/reference/reference.csv",
+    "incoming_data_dir": "data/incoming/",
+    "processed_data_dir": "data/processed/",
+    "file_format": "csv"
+  },
+  "preprocessing": {
+    "missing_value_strategy": {
+      "numerical": "median",
+      "categorical": "mode"
+    },
+    "encoding": {
+      "categorical": "onehot"
+    },
+    "scaling": {
+      "numerical": "standard"
+    }
+  },
+  "split_settings": {
+    "train_test_split": 0.2,
+    "random_state": 42,
+    "stratify": true
+  },
+  "batch_settings": {
+    "batch_sorting": "filename",
+    "label_available_in_batches": true,
+    "save_processed_batches": true
+  }
+}

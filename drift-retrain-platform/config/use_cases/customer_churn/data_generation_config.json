@@ -1,0 +1,21 @@
+{
+  "reference_size": 10000,
+  "batch_size": 500,
+  "number_of_batches": 10,
+  "random_seed": 42,
+  "drift_batches": {
+    "4": {
+      "monthly_charges_mean": 950
+    },
+    "5": {
+      "contract_distribution": {
+        "Month-to-month": 0.70,
+        "One year": 0.20,
+        "Two year": 0.10
+      }
+    },
+    "6": {
+      "support_calls_lambda": 5
+    }
+  }
+}

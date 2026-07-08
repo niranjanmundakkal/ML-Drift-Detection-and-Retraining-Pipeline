@@ -1,0 +1,47 @@
+{
+  "dataset_name": "customer_churn",
+  "task_type": "binary_classification",
+  "target_column": "churn",
+  "id_column": "customer_id",
+  "feature_columns": [
+    "age",
+    "gender",
+    "region",
+    "senior_citizen",
+    "partner",
+    "dependents",
+    "tenure",
+    "contract",
+    "internet_service",
+    "tech_support",
+    "payment_method",
+    "monthly_charges",
+    "total_charges",
+    "avg_monthly_usage_gb",
+    "support_calls_last_6m",
+    "payment_delay_days"
+  ],
+  "numerical_columns": [
+    "age",
+    "tenure",
+    "monthly_charges",
+    "total_charges",
+    "avg_monthly_usage_gb",
+    "support_calls_last_6m",
+    "payment_delay_days"
+  ],
+  "categorical_columns": [
+    "gender",
+    "region",
+    "senior_citizen",
+    "partner",
+    "dependents",
+    "contract",
+    "internet_service",
+    "tech_support",
+    "payment_method"
+  ],
+  "datetime_columns": [],
+  "drop_columns": [],
+  "label_available_in_batches": true
+}
