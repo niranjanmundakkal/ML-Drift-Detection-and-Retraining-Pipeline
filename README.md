@@ -107,6 +107,11 @@ The training pipeline supports multiple models:
 - Logistic Regression
 - Decision Tree
 
+
+- Random Forest
+- Logistic Regression
+- Decision Tree
+
 The pipeline automatically evaluates all candidate models and selects the one with the highest F1 score.
 
 ---
@@ -133,6 +138,41 @@ Decision Tree          F1 = 0.411
 Selected Model:
 Decision Tree
 ```
+
+The best-performing model is selected automatically.
+
+Example:
+
+```
+Random Forest          F1 = 0.345
+
+Logistic Regression    F1 = 0.368
+
+Decision Tree          F1 = 0.411
+
+Selected Model:
+Decision Tree
+```
+
+## Drift Detection
+
+The pipeline continuously compares:
+
+- Reference training data
+- Incoming production batches
+
+Supported methods:
+
+- Kolmogorov–Smirnov (KS) Test
+- Population Stability Index (PSI)
+
+Each feature is assigned:
+
+- Drift score
+- Severity level
+- Drift status
+
+Example:
 
 ---
 
@@ -289,6 +329,11 @@ The synthetic data generator can intentionally inject drift into production batc
 
 Generate synthetic data:
 
+
+# Pipeline Execution
+
+Generate synthetic data:
+
 ```
 python scripts/generate_synthetic_customer_churn.py
 ```
@@ -372,6 +417,14 @@ This project demonstrates:
 - Logging
 - Configuration-driven Pipelines
 
+
+### Data Engineering
+
+- Data Ingestion
+- Batch Processing
+- Logging
+- Configuration-driven Pipelines
+
 ### MLOps
 
 - Drift Detection
@@ -408,3 +461,4 @@ This project was developed as a collaborative effort.
 ## License
 
 This project is intended for educational and portfolio purposes.
+
