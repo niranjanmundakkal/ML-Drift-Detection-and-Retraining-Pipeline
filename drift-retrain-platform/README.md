@@ -86,7 +86,21 @@ This makes the pipeline friendly for new data and reuse in different churn or cl
 
 The pipeline follows a production-style drift detection and retraining flow. A reference dataset is used to train and validate a baseline model, then incoming batches are scored and monitored for distribution shifts.
 
-![Pipeline Architecture](docs/architecture_diagram.svg)
+```mermaid
+flowchart TD
+    A[Raw Data\n(reference + incoming)] --> B[Preprocessing\n(impute, encode, scale)]
+    B --> C[Baseline Training\n(candidate selection)]
+    C --> D[Production Prediction\n(score incoming batches)]
+    D --> E[Drift Detection\n(KS test on features)]
+    E --> F[No Drift\ncontinue monitoring]
+    E --> G[Drift Detected\ntrigger retraining]
+    G --> H[Retraining Policy\ntrain candidate models]
+    H --> I[Candidate Promotion\ncompare champion vs challenger]
+    I --> J[Champion Updated\nif improvement]
+    I --> F
+    J --> K[Reports\npredictions, drift, metrics]
+    F --> K
+```
 
 ### Diagram legend
 
