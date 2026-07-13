@@ -1,4 +1,11 @@
-"""Numerical drift detection placeholder"""
+from scipy.stats import ks_2samp
 
-def detect_numerical_drift(ref, curr):
-    return {}
+
+def numerical_drift(reference_column, batch_column):
+
+    statistic, p_value = ks_2samp(
+        reference_column,
+        batch_column
+    )
+
+    return statistic, p_value

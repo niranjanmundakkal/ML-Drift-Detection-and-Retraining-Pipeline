@@ -1,26 +1,31 @@
 {
   "model": {
-    "model_type": "random_forest",
-    "model_params": {
-      "n_estimators": 100,
-      "random_state": 42
-    }
+    "model_type": "automatic_selection"
   },
+
   "evaluation": {
     "primary_metric": "f1",
-    "metrics": ["accuracy", "precision", "recall", "f1", "roc_auc"]
+    "metrics": [
+      "accuracy",
+      "precision",
+      "recall",
+      "f1",
+      "roc_auc"
+    ]
   },
+
   "drift_detection": {
-    "numerical_method": "psi",
-    "categorical_method": "categorical_psi",
+    "method": "ks_test",
     "threshold": 0.2,
     "bins": 10
   },
+
   "retraining_policy": {
-    "trigger_if_any_feature_drift": true,
+    "trigger_strategy": "drift_percentage",
     "minimum_improvement": 0.01,
     "use_recent_batch_only": false
   },
+
   "model_selection": {
     "selection_strategy": "primary_metric"
   }
