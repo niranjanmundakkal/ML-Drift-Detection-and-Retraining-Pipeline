@@ -1,398 +1,414 @@
-# ML Drift Detection and Retraining Pipeline
+# Automated ML Drift Detection and Retraining Pipeline
+
+An end-to-end Machine Learning monitoring pipeline that continuously detects data drift, evaluates model performance, and automatically retrains and promotes better-performing models using a Champion–Challenger strategy.
+
+---
 
 ## Overview
 
-This project is an end-to-end **ML Drift Detection and Retraining Pipeline** designed to monitor incoming datasets, validate schema consistency, preprocess data, detect drift against a reference dataset, and trigger retraining workflows when significant drift is found.
+Machine learning models deployed in production gradually lose performance as incoming data changes over time. This phenomenon, known as **data drift**, causes prediction quality to degrade even though the model continues making predictions.
 
-The system is built in a modular and configuration-driven way so that components such as schema validation, dataset loading, preprocessing, drift detection, and retraining can be managed independently and extended easily for real-world MLOps workflows.
+This project demonstrates a production-style ML pipeline that:
+
+- Trains a baseline customer churn prediction model
+- Processes incoming production batches
+- Detects feature drift
+- Automatically triggers retraining when drift exceeds a threshold
+- Compares multiple candidate models
+- Promotes the best-performing model
+- Logs predictions, metrics, and drift reports
+
+The project is designed to simulate how production ML systems are monitored and maintained.
 
 ---
 
 ## Problem Statement
 
-Machine learning models often degrade in performance when the characteristics of incoming production data change over time. This issue is commonly known as **data drift** or **dataset drift**.
+Suppose a customer churn model is trained using historical customer data.
 
-The goal of this project is to build a pipeline that:
+Over time:
 
-* monitors new incoming data
-* validates whether the dataset structure matches the expected schema
-* preprocesses the data consistently
-* compares new data with a baseline/reference dataset
-* detects whether significant drift has occurred
-* generates drift analysis outputs
-* triggers retraining workflows when drift exceeds a defined threshold
+- Customer behavior changes
+- Contract preferences shift
+- Monthly charges increase
+- Service usage patterns evolve
 
----
+Although the deployed model continues making predictions, its accuracy slowly decreases because the incoming data distribution no longer matches the original training data.
 
-## Key Features
-
-* **Schema Validation**
-
-  * Validates dataset columns, datatypes, and structure against predefined schema rules.
-* **Config-Driven Pipeline**
-
-  * Uses YAML-based configuration files for flexibility and reusability.
-* **Dataset Loading and Batch Handling**
-
-  * Loads training/reference/current datasets in a structured manner.
-* **Preprocessing Module**
-
-  * Handles transformations and prepares datasets for downstream drift analysis and model workflows.
-* **Drift Detection**
-
-  * Compares current data against reference data using statistical drift checks.
-* **Logging**
-
-  * Structured logging for easier debugging and pipeline tracking.
-* **Retraining Trigger Framework**
-
-  * Supports retraining workflows when drift is detected beyond threshold.
-* **Modular Project Design**
-
-  * Easy to maintain, test, and extend.
+This project solves that problem by continuously monitoring production data and automatically updating the model whenever necessary.
 
 ---
 
-## Project Architecture
+# System Architecture
 
-The pipeline follows a staged architecture:
-
-1. **Load project configurations**
-2. **Validate schema**
-3. **Load reference and current datasets**
-4. **Preprocess the datasets**
-5. **Run drift detection**
-6. **Generate drift results / reports**
-7. **Trigger retraining if drift is detected**
-8. **Store artifacts and logs**
+```
+Reference Dataset
+        │
+        ▼
+Dynamic Preprocessing
+        │
+        ▼
+Train Baseline Model
+        │
+        ▼
+Deploy Model
+        │
+        ▼
+Incoming Batch
+        │
+        ▼
+Feature Transformation
+        │
+        ▼
+Prediction
+        │
+        ▼
+Prediction Logging
+        │
+        ▼
+Drift Detection
+        │
+        ├───────────────┐
+        │               │
+     No Drift        Drift Detected
+        │               │
+        ▼               ▼
+ Continue         Retraining Pipeline
+                        │
+                        ▼
+            Train Candidate Models
+                        │
+                        ▼
+        Champion–Challenger Comparison
+                        │
+                        ▼
+          Promote Better Performing Model
+```
 
 ---
 
-## Project Structure
+# Features
 
-```bash
-ml-drift-detection/
-│
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── main.py
-├── test_config.py
-│
+## Dynamic Preprocessing
+
+- Schema-driven preprocessing
+- Missing value handling
+- Numerical scaling
+- One-hot encoding
+- Feature alignment across batches
+
+---
+
+## Model Training
+
+The training pipeline supports multiple models:
+
+- Random Forest
+- Logistic Regression
+- Decision Tree
+
+The pipeline automatically evaluates all candidate models and selects the one with the highest F1 score.
+
+---
+
+## Automatic Model Selection
+
+Instead of hardcoding one algorithm, every retraining cycle evaluates:
+
+- Random Forest
+- Logistic Regression
+- Decision Tree
+
+The best-performing model is selected automatically.
+
+Example:
+
+```
+Random Forest          F1 = 0.345
+
+Logistic Regression    F1 = 0.368
+
+Decision Tree          F1 = 0.411
+
+Selected Model:
+Decision Tree
+```
+
+---
+
+## Drift Detection
+
+The pipeline continuously compares:
+
+- Reference training data
+- Incoming production batches
+
+Supported methods:
+
+- Kolmogorov–Smirnov (KS) Test
+- Population Stability Index (PSI)
+
+Each feature is assigned:
+
+- Drift score
+- Severity level
+- Drift status
+
+Example:
+
+| Feature | Severity | Drift |
+|----------|----------|-------|
+| Monthly Charges | High | ✅ |
+| Contract | Medium | ✅ |
+| Tenure | Low | ✅ |
+
+---
+
+## Retraining Policy
+
+Retraining is triggered when the percentage of drifted features exceeds the configured threshold.
+
+Example:
+
+```
+Drifted Features : 9
+
+Total Features : 31
+
+Drift Percentage : 29%
+
+Decision:
+
+Retraining Triggered
+```
+
+---
+
+## Champion–Challenger Strategy
+
+When retraining is triggered:
+
+1. Multiple candidate models are trained.
+2. Each model is evaluated.
+3. The best model is selected.
+4. The candidate model is compared against the current production model.
+5. The candidate is promoted only if it improves the primary evaluation metric.
+
+---
+
+## Logging
+
+The pipeline automatically stores:
+
+### Predictions
+
+```
+reports/predictions/
+```
+
+### Drift Reports
+
+```
+reports/drift_reports/
+```
+
+### Evaluation Metrics
+
+```
+reports/metrics/
+```
+
+---
+
+# Project Structure
+
+```
+drift-retrain-platform/
+
 ├── config/
-│   ├── schema.yaml
-│   ├── pipeline_config.yaml
-│   └── model_config.yaml
+│
+├── data/
+│
+├── models/
+│
+├── reports/
+│
+├── scripts/
 │
 ├── src/
-│   ├── components/
-│   │   ├── data_ingestion.py
-│   │   ├── schema_validation.py
-│   │   ├── preprocessing.py
-│   │   ├── drift_detection.py
-│   │   └── retraining.py
-│   │
-│   ├── pipeline/
-│   │   └── training_pipeline.py
-│   │
-│   ├── entity/
-│   │   └── config_entity.py
-│   │
-│   └── utils/
-│       ├── logger.py
-│       ├── common.py
-│       └── config_loader.py
+│   ├── preprocessing/
+│   ├── models/
+│   ├── drift/
+│   ├── retraining/
+│   ├── ingestion/
+│   ├── logging_utils/
+│   └── main.py
 │
-├── notebooks/
-│   └── experiments.ipynb
-│
-├── tests/
-│   └── test_pipeline.py
-│
-├── artifacts/
-│   ├── drift_reports/
-│   ├── processed_data/
-│   └── models/
-│
-└── sample_data/
-    ├── reference_data.csv
-    └── current_data.csv
-```
-
-> Note: The exact structure may vary slightly depending on your implementation.
-
----
-
-## Tech Stack
-
-* **Programming Language:** Python
-* **Data Handling:** Pandas, NumPy
-* **Machine Learning / Drift Utilities:** Scikit-learn, Evidently / custom statistical methods
-* **Configuration Management:** YAML
-* **Logging:** Python logging
-* **Testing:** Pytest
-* **Notebook Experiments:** Jupyter Notebook
-
----
-
-## Workflow Explanation
-
-### 1. Configuration Loading
-
-The pipeline begins by loading all configuration files such as:
-
-* schema configuration
-* pipeline configuration
-* model / drift configuration
-
-This ensures that paths, thresholds, feature lists, and validation rules are centralized and easy to update.
-
----
-
-### 2. Schema Validation
-
-The schema validation module checks whether the incoming dataset matches the expected structure.
-
-Typical checks include:
-
-* required columns present
-* column count validation
-* datatype checks
-* missing or unexpected columns
-
-If schema validation fails, the pipeline can stop early and log the issue before drift analysis begins.
-
----
-
-### 3. Dataset Loading
-
-The ingestion module loads:
-
-* **reference dataset** or baseline data
-* **current dataset** or incoming batch data
-
-These datasets are used for comparison in drift analysis.
-
----
-
-### 4. Data Preprocessing
-
-The preprocessing stage ensures that the input data is transformed consistently before drift checks or model training.
-
-Possible preprocessing tasks include:
-
-* handling missing values
-* encoding categorical features
-* scaling / normalization
-* dropping irrelevant columns
-* feature selection
-* datatype conversion
-
----
-
-### 5. Drift Detection
-
-The drift detection component compares the incoming/current dataset with the reference dataset.
-
-Depending on implementation, this may include:
-
-* statistical tests for numerical features
-* categorical distribution comparison
-* feature-wise drift scoring
-* overall dataset drift decision
-* drift thresholds for alerting or retraining
-
-The output of this stage determines whether the new data distribution has shifted enough to require intervention.
-
----
-
-### 6. Drift Report Generation
-
-After drift analysis, the system can generate:
-
-* drift summary
-* feature-wise drift status
-* drift score outputs
-* HTML / JSON / CSV reports
-* logs for monitoring and debugging
-
----
-
-### 7. Retraining Trigger
-
-If drift exceeds the defined threshold, the pipeline can trigger a retraining workflow.
-
-This retraining step may include:
-
-* preparing updated training data
-* retraining the model
-* storing new model artifacts
-* updating model version / deployment candidate
-
----
-
-## Configuration Files
-
-### `schema.yaml`
-
-Contains schema-related rules such as:
-
-* expected column names
-* numerical / categorical columns
-* target column
-* validation constraints
-
-### `pipeline_config.yaml`
-
-Contains pipeline-level settings such as:
-
-* artifact paths
-* dataset paths
-* report output locations
-* pipeline execution settings
-
-### `model_config.yaml`
-
-Contains model / drift settings such as:
-
-* drift threshold
-* model training parameters
-* preprocessing configuration
-* retraining rules
-
----
-
-## Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
-```
-
-### 2. Create virtual environment
-
-#### Windows
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-#### Linux / Mac
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
+└── requirements.txt
 ```
 
 ---
 
-## How to Run the Project
+# Tech Stack
 
-### Run the main pipeline
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- SciPy
+- JSON Configuration
+- Git
+- GitHub
 
-```bash
-python main.py
+---
+
+# Dataset
+
+The project uses a synthetic customer churn dataset containing realistic telecom customer information.
+
+Features include:
+
+- Age
+- Gender
+- Region
+- Contract Type
+- Internet Service
+- Monthly Charges
+- Total Charges
+- Payment Method
+- Support Calls
+- Payment Delay
+- Usage
+- Customer Tenure
+
+The synthetic data generator can intentionally inject drift into production batches to simulate real-world deployment scenarios.
+
+---
+
+# Pipeline Execution
+
+Generate synthetic data:
+
+```
+python scripts/generate_synthetic_customer_churn.py
 ```
 
-or if your entry file is different:
+Run the complete pipeline:
 
-```bash
-python test_config.py
 ```
-
-or
-
-```bash
-python src/pipeline/training_pipeline.py
-```
-
-Use the command that matches your actual project entry point.
-
----
-
-## Example Pipeline Flow
-
-A typical execution flow of the project looks like this:
-
-```python
-load_all_configs()
-validate_schema()
-load_reference_dataset()
-load_current_dataset()
-preprocess_data()
-run_drift_detection()
-generate_drift_report()
-trigger_retraining_if_needed()
+python src/main.py
 ```
 
 ---
 
-## Sample Use Cases
+# Sample Output
 
-This project can be extended for:
+```
+Processing Batch 004...
 
-* production ML model monitoring
-* batch-based drift analysis pipelines
-* automated retraining workflows
-* MLOps experimentation
-* data quality and model health monitoring systems
+Drift Percentage : 29%
 
----
+Retraining Triggered
 
-## Outputs
+Training Candidate Models...
 
-Depending on implementation, the project can produce:
+Random Forest          F1 = 0.345
 
-* drift reports
-* processed datasets
-* logs
-* trained / retrained model artifacts
-* validation summaries
-* monitoring outputs
+Logistic Regression    F1 = 0.368
 
----
+Decision Tree          F1 = 0.411
 
-## Future Improvements
+Selected Model:
 
-* Add **MLflow** for experiment tracking and model versioning
-* Add **Docker** support for containerized deployment
-* Add **CI/CD pipelines** for automated testing and deployment
-* Add **Airflow / Prefect orchestration**
-* Add **real-time drift monitoring dashboard**
-* Add **email / Slack alerts** when drift is detected
-* Integrate with **cloud storage and model registry**
-* Add **unit tests and integration tests** for all components
+Decision Tree
+
+Candidate Model Promoted
+```
 
 ---
 
-## Key Learnings from the Project
+# Evaluation Metrics
 
-* Building a modular ML pipeline using Python
-* Designing config-driven workflows for scalability
-* Implementing schema validation and preprocessing stages
-* Understanding data drift and retraining strategies
-* Structuring an MLOps-style project for maintainability and extension
+The pipeline evaluates:
+
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- ROC-AUC
+
+The primary metric used for model promotion is configurable.
 
 ---
 
-## Author
+# Future Improvements
 
-**Niranjan M**
-B.Tech CSE Student | Interested in Data Engineering, Machine Learning, and MLOps
+- MLflow model registry
+- FastAPI prediction service
+- Prefect orchestration
+- Evidently AI monitoring dashboard
+- Streamlit monitoring UI
+- Docker deployment
+- CI/CD integration
+- Model explainability using SHAP
 
+---
+
+# Learning Outcomes
+
+This project demonstrates:
+
+### Machine Learning
+
+- Classification
+- Feature Engineering
+- Model Evaluation
+- Automatic Model Selection
+
+### Data Engineering
+
+- Data Ingestion
+- Batch Processing
+- Logging
+- Configuration-driven Pipelines
+
+### MLOps
+
+- Drift Detection
+- Retraining Automation
+- Champion–Challenger Deployment
+- Production Monitoring
+
+---
+
+# Contributors
+
+This project was developed as a collaborative effort.
+
+### AI/ML Responsibilities
+
+- Model training
+- Automatic model selection
+- Drift detection
+- Retraining policy
+- Champion–Challenger model promotion
+- Evaluation pipeline
+
+### Data Engineering Responsibilities
+
+- Data ingestion
+- Batch management
+- Dynamic preprocessing
+- Configuration management
+- Logging infrastructure
+- Synthetic data generation
 
 ---
 
 ## License
 
-This project is intended for learning, experimentation, and portfolio demonstration.
-You can add an MIT License if you want to make it open source.
+This project is intended for educational and portfolio purposes.
+
+
+
+
