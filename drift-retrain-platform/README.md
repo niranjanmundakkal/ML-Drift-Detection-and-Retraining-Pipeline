@@ -1,6 +1,6 @@
 # Drift Retraining Platform
 
-A production-style churn classification pipeline that automatically monitors incoming data, detects distribution drift, and retrains candidate models when needed.
+A production-style drift retraining pipeline with selectable use cases that automatically monitors incoming data, detects distribution drift, and retrains candidate models when needed.
 
 ## Why this project matters
 
@@ -33,11 +33,11 @@ You can run the pipeline with your own CSV files instead of the generated sample
 
 ### Required schema
 
-Your data must include the target column and all feature columns defined in:
+Your data must include the target column and all feature columns defined in the active use case schema:
 
-- `config/use_cases/customer_churn/schema.json`
+- `config/use_cases/<active_use_case>/schema.json`
 
-For this project, the expected columns are:
+The current default active use case is `customer_churn`, and its expected columns are:
 
 - `customer_id`
 - `age`
@@ -57,6 +57,8 @@ For this project, the expected columns are:
 - `support_calls_last_6m`
 - `payment_delay_days`
 - `churn`
+
+If you switch the active use case to `credit_risk`, use the schema in `config/use_cases/credit_risk/schema.json` instead.
 
 ### Useful tips
 
@@ -82,18 +84,38 @@ This makes the pipeline friendly for new data and reuse in different churn or cl
 
 ## Architecture
 
+The pipeline follows a production-style drift detection and retraining flow. A reference dataset is used to train and validate a baseline model, then incoming batches are scored and monitored for distribution shifts.
+
 ![Pipeline Architecture](docs/architecture_diagram.svg)
 
-### High-level flow
+### Diagram legend
 
-1. Load reference and batch data.
-2. Validate schema and prepare metadata.
-3. Fit a preprocessing pipeline with imputation, encoding, and scaling.
-4. Train a baseline model using automatic candidate selection.
-5. Score incoming batches and log predictions.
-6. Run drift detection using KS tests across transformed features.
-7. If drift exceeds policy thresholds, retrain candidate models.
-8. Promote a challenger only if it outperforms the current champion.
+- **Raw Data**: reference dataset and incoming batch CSVs.
+- **Preprocessing**: missing value imputation, categorical encoding, numerical scaling, and feature alignment.
+- **Baseline Training**: candidate model training and champion selection.
+- **Production Prediction**: scoring incoming batches with the current champion.
+- **Drift Detection**: distribution comparison using KS tests.
+- **Retraining Policy**: drift-triggered candidate retraining and evaluation.
+- **Candidate Promotion**: promote the challenger when it improves the champion.
+
+### Architecture overview
+
+- **Data ingestion**: load reference data and ordered incoming batch CSVs.
+- **Schema validation**: verify required feature and target columns before processing.
+- **Dynamic preprocessing**: impute missing values, one-hot encode categorical features, scale numerical features, and preserve feature alignment.
+- **Baseline model training**: automatically select the best candidate model from Random Forest, Logistic Regression, and Decision Tree.
+- **Batch scoring**: use the current champion model to generate predictions and probabilities for each batch.
+- **Drift detection**: compare transformed feature distributions with the reference dataset using KS tests.
+- **Retraining policy**: if drift exceeds configured thresholds, retrain candidates and evaluate them.
+- **Champion-Challenger promotion**: promote a new model only when it outperforms the current champion on the primary metric.
+
+### Data flow
+
+1. Raw data enters the pipeline via `data/reference/reference.csv` and `data/incoming/*.csv`.
+2. `src/main.py` initializes the config, metadata, and preprocessor.
+3. The preprocessor is fitted on reference data and applied to incoming batches.
+4. Models are trained, evaluated, and predictions are generated.
+5. Drift reports, metrics, and prediction logs are written to `reports/`.
 
 ## Repository structure
 
@@ -180,7 +202,9 @@ The active use case is selected in `config/active_config.json`:
 }
 ```
 
-### Pipeline settings: `config/use_cases/customer_churn/pipeline_config.json`
+You can change the active use case to another folder under `config/use_cases/`, such as `credit_risk`, and the pipeline will load the correct schema, pipeline config, and model config for that use case.
+
+### Pipeline settings: `config/use_cases/<active_use_case>/pipeline_config.json`
 
 - `reference_data_path`: path to the reference dataset.
 - `incoming_data_dir`: directory containing batch CSV files.
