@@ -1,11 +1,49 @@
 {
   "dataset_name": "credit_risk",
   "task_type": "binary_classification",
-  "target_column": "target",
-  "id_column": null,
-  "feature_columns": ["age", "income", "loan_amount", "credit_score", "tenure"],
-  "numerical_columns": ["age", "income", "loan_amount", "credit_score", "tenure"],
-  "categorical_columns": [],
+  "target_column": "default",
+  "id_column": "applicant_id",
+
+  "feature_columns": [
+    "age",
+    "annual_income",
+    "employment_status",
+    "years_employed",
+    "credit_score",
+    "loan_amount",
+    "loan_term",
+    "interest_rate",
+    "debt_to_income_ratio",
+    "existing_loans",
+    "payment_history",
+    "home_ownership",
+    "marital_status",
+    "loan_purpose",
+    "region"
+  ],
+
+  "numerical_columns": [
+    "age",
+    "annual_income",
+    "years_employed",
+    "credit_score",
+    "loan_amount",
+    "loan_term",
+    "interest_rate",
+    "debt_to_income_ratio",
+    "existing_loans"
+  ],
+
+  "categorical_columns": [
+    "employment_status",
+    "payment_history",
+    "home_ownership",
+    "marital_status",
+    "loan_purpose",
+    "region"
+  ],
+
   "datetime_columns": [],
-  "drop_columns": []
+  "drop_columns": [],
+  "label_available_in_batches": true
 }

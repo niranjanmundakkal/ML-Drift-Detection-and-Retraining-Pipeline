@@ -20,7 +20,7 @@ This project demonstrates a production-style MLOps pipeline that:
 * Employs a **Champion-Challenger** promotion strategy to update models safely.
 * Exports detailed logs, predictions, drift reports, and metrics.
 
----
+The project is designed to simulate how production ML systems are monitored and maintained.
 
 ## Problem Statement
 
@@ -68,7 +68,8 @@ flowchart TD
 - **Retraining Policy**: Evaluates if the proportion of drifted features exceeds the configured threshold.
 - **Champion-Challenger Promotion**: Trains a **Challenger** model using the combined reference and batch data, evaluating both on the primary metric. The challenger is promoted only if it outperforms the champion.
 
----
+- Kolmogorov–Smirnov (KS) Test
+- Population Stability Index (PSI)
 
 ## Selectable Use Cases
 
@@ -234,7 +235,7 @@ After execution, outputs are written to the following paths in `drift-retrain-pl
 - **`reports/drift_reports/`**: Contains CSV files summarizing the KS statistic, p-value, drift severity, and detection status for all features.
 - **`reports/metrics/`**: Logs validation performance metrics for the baseline model and any retrained challenger models.
 
----
+The primary metric used for model promotion is configurable.
 
 ## Learning Outcomes
 
@@ -252,7 +253,19 @@ This project demonstrates core competencies across multiple domains:
 * **Feature Alignment**: Aligning schemas across heterogeneous production data batches.
 * **Configuration Management**: Building configuration-driven workflows (YAML and JSON schemas).
 
----
+### Machine Learning
+
+- Classification
+- Feature Engineering
+- Model Evaluation
+- Automatic Model Selection
+
+### Data Engineering
+
+- Data Ingestion
+- Batch Processing
+- Logging
+- Configuration-driven Pipelines
 
 ## Contributors
 
