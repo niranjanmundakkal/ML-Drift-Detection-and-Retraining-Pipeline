@@ -20,7 +20,7 @@ This project demonstrates a production-style MLOps pipeline that:
 * Employs a **Champion-Challenger** promotion strategy to update models safely.
 * Exports detailed logs, predictions, drift reports, and metrics.
 
-The project is designed to simulate how production ML systems are monitored and maintained.
+---
 
 ## Problem Statement
 
@@ -68,8 +68,7 @@ flowchart TD
 - **Retraining Policy**: Evaluates if the proportion of drifted features exceeds the configured threshold.
 - **Champion-Challenger Promotion**: Trains a **Challenger** model using the combined reference and batch data, evaluating both on the primary metric. The challenger is promoted only if it outperforms the champion.
 
-- Kolmogorov–Smirnov (KS) Test
-- Population Stability Index (PSI)
+---
 
 ## Selectable Use Cases
 
@@ -138,7 +137,7 @@ When retraining is triggered, candidate models are trained and the best candidat
 
 ## Repository Structure
 
-The project code is located in the `drift-retrain-platform` directory:
+The project code is located in this directory:
 
 ```text
 drift-retrain-platform/
@@ -180,10 +179,9 @@ drift-retrain-platform/
 ## Getting Started
 
 ### 1. Setup Environment
-Navigate into the platform directory and install dependencies:
+Navigate into this directory and install dependencies:
 
 ```bash
-cd drift-retrain-platform
 python -m venv .venv
 # On Windows
 .venv\Scripts\activate
@@ -229,13 +227,13 @@ python src/main.py
 
 ## Output Logs & Artifacts
 
-After execution, outputs are written to the following paths in `drift-retrain-platform/`:
+After execution, outputs are written to the following paths:
 
 - **`reports/predictions/`**: Contains CSV exports of batch-level predictions alongside their probabilities.
 - **`reports/drift_reports/`**: Contains CSV files summarizing the KS statistic, p-value, drift severity, and detection status for all features.
 - **`reports/metrics/`**: Logs validation performance metrics for the baseline model and any retrained challenger models.
 
-The primary metric used for model promotion is configurable.
+---
 
 ## Learning Outcomes
 
@@ -253,19 +251,7 @@ This project demonstrates core competencies across multiple domains:
 * **Feature Alignment**: Aligning schemas across heterogeneous production data batches.
 * **Configuration Management**: Building configuration-driven workflows (YAML and JSON schemas).
 
-### Machine Learning
-
-- Classification
-- Feature Engineering
-- Model Evaluation
-- Automatic Model Selection
-
-### Data Engineering
-
-- Data Ingestion
-- Batch Processing
-- Logging
-- Configuration-driven Pipelines
+---
 
 ## Contributors
 
