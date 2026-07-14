@@ -1,15 +1,35 @@
 {
-  "missing_value_strategy": {
-    "numerical": "median",
-    "categorical": "mode"
+  "data_settings": {
+    "reference_data_path": "data/reference/reference.csv",
+    "incoming_data_dir": "data/incoming/",
+    "processed_data_dir": "data/processed/",
+    "file_format": "csv"
   },
-  "encoding": {
-    "categorical": "onehot"
+
+  "preprocessing": {
+    "missing_value_strategy": {
+      "numerical": "median",
+      "categorical": "mode"
+    },
+
+    "encoding": {
+      "categorical": "onehot"
+    },
+
+    "scaling": {
+      "numerical": "standard"
+    }
   },
-  "scaling": {
-    "numerical": "standard"
+
+  "split_settings": {
+    "train_test_split": 0.2,
+    "random_state": 42,
+    "stratify": true
   },
-  "train_test_split": 0.2,
-  "random_state": 42,
-  "save_processed_data": true
+
+  "batch_settings": {
+    "batch_sorting": "filename",
+    "label_available_in_batches": true,
+    "save_processed_batches": true
+  }
 }

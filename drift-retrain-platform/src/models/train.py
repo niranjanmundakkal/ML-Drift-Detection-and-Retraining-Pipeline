@@ -3,7 +3,7 @@ Training utilities for the orchestration pipeline.
 Automatically selects the best model.
 """
 
-import numpy as np
+
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -68,10 +68,20 @@ def train_baseline_model(X_ref, y_ref, metadata=None, model_config=None):
     return best_model
 
 
+import pandas as pd
+
+
 def retrain_model(X_ref, y_ref, X_batch, y_batch, metadata=None, model_config=None):
 
-    X_new = np.vstack([X_ref, X_batch])
-    y_new = np.concatenate([y_ref, y_batch])
+    X_new = pd.concat(
+        [X_ref, X_batch],
+        ignore_index=True
+    )
+
+    y_new = pd.concat(
+        [y_ref, y_batch],
+        ignore_index=True
+    )
 
     return train_baseline_model(
         X_ref=X_new,
